@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+/classApp/classApp/cloudcomputingclass-377007-baf039d70271.json
+

@@ -1,0 +1,6 @@
+Flask~=2.3.1
+moviepy~=1.0.3
+google-cloud-speech~=2.19.0
+google-cloud-storage~=2.8.0
+firebase-admin~=6.1.0
+google-cloud-pubsub~=2.16.0

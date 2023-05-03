@@ -1,0 +1,51 @@
+﻿@model IEnumerable<classApp.Models.Video>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                Date Uploaded
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Owner)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                <img width="75" height="75" src="data:image/jpeg;base64,@item.Thumbnail" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateUploadedDT)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => User.Identity.Name)
+            </td>
+            <td>
+                <a href="@item.flacLink">Transcription</a> |
+                <a href="@item.Link">Download</a> |
+                @Html.ActionLink("Delete", "Delete", new { vidId=item.Id })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

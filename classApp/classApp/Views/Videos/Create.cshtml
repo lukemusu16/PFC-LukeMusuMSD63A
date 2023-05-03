@@ -1,0 +1,77 @@
+﻿@model classApp.Models.Video
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+<h1>Create</h1>
+
+<h4>Video</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data" method="post" id="upload-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Upload Video</label>
+                <input type="file" class="form-control" name="file" accept="video/mp4" id="file-input"/>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+            <progress id="progress-bar" style="display:none"></progress>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+        integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+        crossorigin="anonymous">
+</script>
+<script type="text/javascript">
+    $("#upload-form").submit(function (e) {
+        var formData = new FormData(this);
+        var progressBar = $("#progress-bar");
+
+
+        $.ajax({
+            url: "/Videos/Create",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentData: false,
+            xhr: function () {
+                var fileXhr = $.ajaxSettings.xhr();
+                if (fileXhr.upload) {
+                    $("progress").show();
+                    fileXhr.upload.addEventListener("progress", function (e) {
+                        if (e.lengthComputable) {
+                            $("#progress-bar").attr({
+                                value: e.loaded,
+                                max: e.total
+                            });
+                        }
+                    }, false);
+                }
+                return fileXhr;
+            },
+            success: function (response) {
+                $("progress").hide();
+                $("#progress-bar").attr({
+                    value: 0
+                });
+            }
+        });
+    });
+</script>
+
