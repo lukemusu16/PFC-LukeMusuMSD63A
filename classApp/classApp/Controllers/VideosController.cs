@@ -118,5 +118,31 @@ namespace classApp.Controllers
             return RedirectToAction("Index");
         }
 
+
+        public async Task<IActionResult>DownloadVideo(string vidId)
+        {
+            try
+            {
+                var video = await fvr.GetVideo(GlobalValues.UserID, vidId);
+                var downloadId = Guid.NewGuid().ToString();
+
+                Download d = new Download();
+                d.Id = downloadId;
+                d.DateDonwloaded = Timestamp.FromDateTime(DateTime.UtcNow);
+
+                fvr.AddDowload(GlobalValues.UserID, vidId, d);
+                logger.LogInformation($"Downloaded added to firestore");
+
+                return new RedirectResult(video.Link);
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation(e, $"Downloaded not added to firestore");
+                return View();
+            }
+
+            
+        }
+
     }
 }

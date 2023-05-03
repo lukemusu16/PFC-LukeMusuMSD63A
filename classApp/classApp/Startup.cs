@@ -26,7 +26,7 @@ namespace classApp
         public Startup(IConfiguration configuration, IWebHostEnvironment host)
         {
             System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS",
-                host.ContentRootPath + "\\cloudcomputingclass-377007-baf039d70271.json");
+                host.ContentRootPath + "/cloudcomputingclass-377007-baf039d70271.json");
             Configuration = configuration;
         }
 

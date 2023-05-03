@@ -31,6 +31,18 @@ namespace classApp.DataAccess
             await docRef.SetAsync(v);
         }
 
+        public async void AddDowload(string userId, string vidId, Download d)
+        { 
+            DocumentReference docRef = db.Collection("Users")
+                                         .Document(userId)
+                                         .Collection("Videos")
+                                         .Document(vidId)
+                                         .Collection("Downloads").Document(d.Id);
+
+            await docRef.SetAsync(d);
+
+        }
+
         public async Task<List<Video>> GetVideos(string userId)
         {
             List<Video> videos = new List<Video>();
