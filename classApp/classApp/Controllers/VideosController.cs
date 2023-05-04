@@ -27,6 +27,7 @@ namespace classApp.Controllers
             pstr = _pstr;
         }
 
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -34,7 +35,7 @@ namespace classApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult Create(Video v, IFormFile file)
+        public IActionResult Create(Video v, IFormFile file, IFormFile thumbnail)
         {
             try
             {
@@ -43,8 +44,11 @@ namespace classApp.Controllers
                 {
                     
                     var storage = StorageClient.Create();
+
+                    using Stream picStream = thumbnail.OpenReadStream();
+                    v.Thumbnail = fvr.GetThumbnailBase64(picStream);
+
                     using Stream fileStream = file.OpenReadStream();
-                    v.Thumbnail = fvr.GetThumbnailBase64(fileStream);
 
                     string newFilename = Guid.NewGuid().ToString() + System.IO.Path.GetExtension(file.FileName);
 
@@ -81,6 +85,7 @@ namespace classApp.Controllers
 
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             var list = fvr.GetVideos(GlobalValues.UserID).Result;
@@ -88,7 +93,7 @@ namespace classApp.Controllers
             return View(list);
         }
 
-
+        [Authorize]
         public async Task<IActionResult> Delete(string vidId)
         {
             try
@@ -118,7 +123,7 @@ namespace classApp.Controllers
             return RedirectToAction("Index");
         }
 
-
+        [Authorize]
         public async Task<IActionResult>DownloadVideo(string vidId)
         {
             try
@@ -140,8 +145,6 @@ namespace classApp.Controllers
                 logger.LogInformation(e, $"Downloaded not added to firestore");
                 return View();
             }
-
-            
         }
 
     }

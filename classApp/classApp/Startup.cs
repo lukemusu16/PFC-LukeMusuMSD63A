@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,15 @@ namespace classApp
         {
             string project = Configuration["project"];
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                options.OnAppendCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+            });
+
             services.AddGoogleErrorReportingForAspNetCore(new ErrorReportingServiceOptions
             {
                 // Replace ProjectId with your Google Cloud Project ID.
@@ -47,7 +57,7 @@ namespace classApp
                 Version = "1"
             });
 
-
+            
             //oath_secretKey
             // Create the client.
             SecretManagerServiceClient client = SecretManagerServiceClient.Create();
@@ -74,6 +84,7 @@ namespace classApp
                 {
                     options.ClientId = "500567993145-9a66bv7rrqfodumr68fduqe2ijkmp91h.apps.googleusercontent.com";
                     options.ClientSecret = "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";
+                    options.CorrelationCookie.Name = ".AspNetCore.Correlation.Google";
                 });
 
             services.AddControllersWithViews();
@@ -102,6 +113,7 @@ namespace classApp
 
             app.UseRouting();
 
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -111,6 +123,16 @@ namespace classApp
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private void CheckSameSite(HttpContext httpContext, CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None)
+            {
+                var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+                if (true)
+                    options.SameSite = SameSiteMode.Unspecified;
+            }
         }
     }
 }

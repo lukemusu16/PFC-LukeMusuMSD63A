@@ -12,6 +12,8 @@ using NReco.VideoConverter;
 using System.Drawing;
 using Microsoft.Extensions.Logging;
 using classApp.Controllers;
+using static System.Net.Mime.MediaTypeNames;
+using Xabe.FFmpeg;
 
 namespace classApp.DataAccess
 {
@@ -89,37 +91,17 @@ namespace classApp.DataAccess
             await docRef.DeleteAsync();
         }
 
-        public string GetThumbnailBase64(Stream videoStream)
+        public string GetThumbnailBase64(Stream imageStream)
         {
-            string tempVideoPath = Path.GetTempFileName();
-            string tempThumbnailPath = Path.GetTempFileName();
+            System.Drawing.Image image = System.Drawing.Image.FromStream(imageStream);
 
+            MemoryStream m = new MemoryStream();
+            image.Save(m, image.RawFormat);
+            byte[] bytes = m.ToArray();
 
-            using (FileStream tempFileStream = File.Create(tempVideoPath))
-            {
-                videoStream.CopyTo(tempFileStream);
-            }
+            string base64String = Convert.ToBase64String(bytes);
 
-            FFMpegConverter ffMpeg = new FFMpegConverter();
-            ffMpeg.GetVideoThumbnail(tempVideoPath, tempThumbnailPath);
-
-            string base64String = "";
-
-            using (Image image = Image.FromFile(tempThumbnailPath))
-            {
-                using (MemoryStream m = new MemoryStream())
-                {
-                    image.Save(m, image.RawFormat);
-                    byte[] imageBytes = m.ToArray();
-
-                    base64String = Convert.ToBase64String(imageBytes);
-
-                    image.Dispose();
-                }
-            }
-
-            File.Delete(tempVideoPath);
-            File.Delete(tempThumbnailPath);
+            m.Dispose();
 
             return base64String;
         }
